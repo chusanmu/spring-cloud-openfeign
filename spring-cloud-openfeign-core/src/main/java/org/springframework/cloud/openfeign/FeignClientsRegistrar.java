@@ -138,26 +138,40 @@ class FeignClientsRegistrar
 		this.resourceLoader = resourceLoader;
 	}
 
+	/**
+	 * TODO: 容器启动后，会走到此方法中
+	 * @param metadata
+	 * @param registry
+	 */
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata metadata,
 			BeanDefinitionRegistry registry) {
 		registerDefaultConfiguration(metadata, registry);
+		// TODO: 重点，找到FeignClient
 		registerFeignClients(metadata, registry);
 	}
 
+	/**
+	 * 注册默认的配置
+	 * @param metadata
+	 * @param registry
+	 */
 	private void registerDefaultConfiguration(AnnotationMetadata metadata,
 			BeanDefinitionRegistry registry) {
+		// TODO: 拿到EnableFeignClients注解信息
 		Map<String, Object> defaultAttrs = metadata
 				.getAnnotationAttributes(EnableFeignClients.class.getName(), true);
 
 		if (defaultAttrs != null && defaultAttrs.containsKey("defaultConfiguration")) {
 			String name;
+			// TODO: 决定使用哪个名称
 			if (metadata.hasEnclosingClass()) {
 				name = "default." + metadata.getEnclosingClassName();
 			}
 			else {
 				name = "default." + metadata.getClassName();
 			}
+			// TODO: 注册配置，拿默认的defalutConfiguration
 			registerClientConfiguration(registry, name,
 					defaultAttrs.get("defaultConfiguration"));
 		}
@@ -165,13 +179,15 @@ class FeignClientsRegistrar
 
 	public void registerFeignClients(AnnotationMetadata metadata,
 			BeanDefinitionRegistry registry) {
+		// TODO: 拿到一个classPath扫描器
 		ClassPathScanningCandidateComponentProvider scanner = getScanner();
 		scanner.setResourceLoader(this.resourceLoader);
 
 		Set<String> basePackages;
-
+		// TODO: 同样的，拿EnableFeignClients的信息
 		Map<String, Object> attrs = metadata
 				.getAnnotationAttributes(EnableFeignClients.class.getName());
+		// TODO: 默认的过滤类型FeignClient，过滤FeignClient
 		AnnotationTypeFilter annotationTypeFilter = new AnnotationTypeFilter(
 				FeignClient.class);
 		final Class<?>[] clients = attrs == null ? null
@@ -314,6 +330,7 @@ class FeignClientsRegistrar
 					AnnotatedBeanDefinition beanDefinition) {
 				boolean isCandidate = false;
 				if (beanDefinition.getMetadata().isIndependent()) {
+					// TODO: 如果当前类 不是注解类型的class，就是合格的
 					if (!beanDefinition.getMetadata().isAnnotation()) {
 						isCandidate = true;
 					}
@@ -384,8 +401,10 @@ class FeignClientsRegistrar
 
 	private void registerClientConfiguration(BeanDefinitionRegistry registry, Object name,
 			Object configuration) {
+		// TODO: 添加了一个beanDefinition FeignClientSpecification
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder
 				.genericBeanDefinition(FeignClientSpecification.class);
+		// TODO: 把这两个值设置到FeignClientSpecification的构造方法中
 		builder.addConstructorArgValue(name);
 		builder.addConstructorArgValue(configuration);
 		registry.registerBeanDefinition(

@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Import;
  * Configures component scanning directives for use with
  * {@link org.springframework.context.annotation.Configuration}
  * <code>@Configuration</code> classes.
- *
+ * TODO：开启使用Feign
  * @author Spencer Gibb
  * @author Dave Syer
  * @since 1.0
