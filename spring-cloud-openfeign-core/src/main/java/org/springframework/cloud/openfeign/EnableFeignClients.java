@@ -77,6 +77,7 @@ public @interface EnableFeignClients {
 	 *
 	 * @see FeignClientsConfiguration for the defaults
 	 * @return list of default configurations
+	 * 可以指定一个默认的配置文件
 	 */
 	Class<?>[] defaultConfiguration() default {};
 

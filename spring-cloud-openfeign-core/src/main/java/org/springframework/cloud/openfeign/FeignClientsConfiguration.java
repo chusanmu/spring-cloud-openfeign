@@ -60,6 +60,7 @@ import org.springframework.format.support.FormattingConversionService;
 import static feign.form.ContentType.MULTIPART;
 
 /**
+ * TODO: 重要，feign客户端 一系列的默认值
  * @author Dave Syer
  * @author Venil Noronha
  * @author Darren Foong
@@ -67,9 +68,15 @@ import static feign.form.ContentType.MULTIPART;
 @Configuration(proxyBeanMethods = false)
 public class FeignClientsConfiguration {
 
+	/**
+	 *  TODO: 把spring mvc 中内容转换器 拿到所有的内容转换器
+	 */
 	@Autowired
 	private ObjectFactory<HttpMessageConverters> messageConverters;
 
+	/**
+	 * TODO: 把所有的注解处理器注入进来
+	 */
 	@Autowired(required = false)
 	private List<AnnotatedParameterProcessor> parameterProcessors = new ArrayList<>();
 
@@ -85,6 +92,7 @@ public class FeignClientsConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public Decoder feignDecoder() {
+		// TODO: 在这里可以看到默认添加了一个spring的解码器，把所有的内容转换器传了进去
 		return new OptionalDecoder(
 				new ResponseEntityDecoder(new SpringDecoder(this.messageConverters)));
 	}
@@ -93,6 +101,7 @@ public class FeignClientsConfiguration {
 	@ConditionalOnMissingBean
 	@ConditionalOnMissingClass("org.springframework.data.domain.Pageable")
 	public Encoder feignEncoder(ObjectProvider<AbstractFormWriter> formWriterProvider) {
+		// TODO: 这里就是添加了一个spring的编码器
 		return springEncoder(formWriterProvider);
 	}
 
@@ -103,7 +112,7 @@ public class FeignClientsConfiguration {
 			ObjectProvider<AbstractFormWriter> formWriterProvider) {
 		PageableSpringEncoder encoder = new PageableSpringEncoder(
 				springEncoder(formWriterProvider));
-
+		// TODO: 可以看到 这里支持分页 page, size , sort
 		if (springDataWebProperties != null) {
 			encoder.setPageParameter(
 					springDataWebProperties.getPageable().getPageParameter());
@@ -118,6 +127,7 @@ public class FeignClientsConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public Contract feignContract(ConversionService feignConversionService) {
+		// TODO: springMVC内容协商器
 		return new SpringMvcContract(this.parameterProcessors, feignConversionService);
 	}
 
@@ -133,6 +143,7 @@ public class FeignClientsConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public Retryer feignRetryer() {
+		// TODO: 默认开启永不重试
 		return Retryer.NEVER_RETRY;
 	}
 

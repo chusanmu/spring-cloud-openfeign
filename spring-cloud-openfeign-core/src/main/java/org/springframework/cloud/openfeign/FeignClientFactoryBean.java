@@ -47,6 +47,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * TODO: 每一个FeignClient都会被当成一个FeignClientFactoryBean 添加到容器里面
  * @author Spencer Gibb
  * @author Venil Noronha
  * @author Eko Kurniawan Khannedy
@@ -87,11 +88,17 @@ class FeignClientFactoryBean
 		Assert.hasText(this.name, "Name must be set");
 	}
 
+	/**
+	 * TODO: 构建feign的builder
+	 * @param context
+	 * @return
+	 */
 	protected Feign.Builder feign(FeignContext context) {
 		FeignLoggerFactory loggerFactory = get(context, FeignLoggerFactory.class);
 		Logger logger = loggerFactory.create(this.type);
 
 		// @formatter:off
+		// TODO: 利用builder配置一系列的解码器，编码器，内容协商器
 		Feign.Builder builder = get(context, Feign.Builder.class)
 				// required values
 				.logger(logger)
@@ -106,6 +113,7 @@ class FeignClientFactoryBean
 	}
 
 	protected void configureFeign(FeignContext context, Feign.Builder builder) {
+		// TODO: 从容器中拿到feign的配置类
 		FeignClientProperties properties = this.applicationContext
 				.getBean(FeignClientProperties.class);
 
@@ -308,6 +316,7 @@ class FeignClientFactoryBean
 	 */
 	<T> T getTarget() {
 		FeignContext context = this.applicationContext.getBean(FeignContext.class);
+		// TODO: 重点，构建feign的builder
 		Feign.Builder builder = feign(context);
 
 		if (!StringUtils.hasText(this.url)) {

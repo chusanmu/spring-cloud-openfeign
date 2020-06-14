@@ -190,13 +190,17 @@ class FeignClientsRegistrar
 		// TODO: 默认的过滤类型FeignClient，过滤FeignClient
 		AnnotationTypeFilter annotationTypeFilter = new AnnotationTypeFilter(
 				FeignClient.class);
+		// TODO: 如果EnableFeignClients上面指定了 client, 则只加载配置的FeignClient,否则进行扫描包
 		final Class<?>[] clients = attrs == null ? null
 				: (Class<?>[]) attrs.get("clients");
+		// TODO: 显然一般不会自己去指定的啊
 		if (clients == null || clients.length == 0) {
+			// TODO: 所以设置一下扫描的基本包和对应的类型
 			scanner.addIncludeFilter(annotationTypeFilter);
 			basePackages = getBasePackages(metadata);
 		}
 		else {
+			// TODO: 否则就加载你自己指定的clazz
 			final Set<String> clientClasses = new HashSet<>();
 			basePackages = new HashSet<>();
 			for (Class<?> clazz : clients) {
@@ -207,41 +211,53 @@ class FeignClientsRegistrar
 				@Override
 				protected boolean match(ClassMetadata metadata) {
 					String cleaned = metadata.getClassName().replaceAll("\\$", ".");
+					// TODO: 看你自己指定的class集合里面是否包含当前的class
 					return clientClasses.contains(cleaned);
 				}
 			};
 			scanner.addIncludeFilter(
 					new AllTypeFilter(Arrays.asList(filter, annotationTypeFilter)));
 		}
-
+		// TODO: 这里重点，开始扫描包了呀
 		for (String basePackage : basePackages) {
+			// TODO: 在当前包下， 扫描器去查找合格的组件
 			Set<BeanDefinition> candidateComponents = scanner
 					.findCandidateComponents(basePackage);
+			// TODO: 遍历找到的组件
 			for (BeanDefinition candidateComponent : candidateComponents) {
+				// TODO: 如果当前beanDefinition是注解方式找到的才合格
 				if (candidateComponent instanceof AnnotatedBeanDefinition) {
 					// verify annotated class is an interface
 					AnnotatedBeanDefinition beanDefinition = (AnnotatedBeanDefinition) candidateComponent;
 					AnnotationMetadata annotationMetadata = beanDefinition.getMetadata();
 					Assert.isTrue(annotationMetadata.isInterface(),
 							"@FeignClient can only be specified on an interface");
-
+					// TODO: 把当前的注解元信息拿到手
 					Map<String, Object> attributes = annotationMetadata
 							.getAnnotationAttributes(
 									FeignClient.class.getCanonicalName());
-
+					// TODO: 解析注解中的值，取名字
 					String name = getClientName(attributes);
+					// TODO: 注册配置类，当前feign Client的专属配置类
 					registerClientConfiguration(registry, name,
 							attributes.get("configuration"));
-
+					// TODO: 注册一个feign client 重点
 					registerFeignClient(registry, annotationMetadata, attributes);
 				}
 			}
 		}
 	}
 
+	/**
+	 * TODO: 注册Feign client
+	 * @param registry
+	 * @param annotationMetadata
+	 * @param attributes
+	 */
 	private void registerFeignClient(BeanDefinitionRegistry registry,
 			AnnotationMetadata annotationMetadata, Map<String, Object> attributes) {
 		String className = annotationMetadata.getClassName();
+		// TODO: 注意，这里注册的其实是FeignClientFactoryBean， 这个工厂bean待会研究
 		BeanDefinitionBuilder definition = BeanDefinitionBuilder
 				.genericBeanDefinition(FeignClientFactoryBean.class);
 		validate(attributes);
@@ -340,6 +356,11 @@ class FeignClientsRegistrar
 		};
 	}
 
+	/**
+	 * TODO: 拿到一个需要扫描的路径集合
+	 * @param importingClassMetadata
+	 * @return
+	 */
 	protected Set<String> getBasePackages(AnnotationMetadata importingClassMetadata) {
 		Map<String, Object> attributes = importingClassMetadata
 				.getAnnotationAttributes(EnableFeignClients.class.getCanonicalName());

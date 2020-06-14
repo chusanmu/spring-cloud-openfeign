@@ -63,6 +63,9 @@ public class SpringDecoder implements Decoder {
 				response.request());
 	}
 
+	/**
+	 * TODO: 适配器模式的应用，适配ClientHttpResponse接口，实际上做事的是Response
+	 */
 	private final class FeignResponseAdapter implements ClientHttpResponse {
 
 		private final Response response;

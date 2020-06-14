@@ -69,6 +69,11 @@ public class SpringEncoder implements Encoder {
 		this.messageConverters = messageConverters;
 	}
 
+	/**
+	 * 把messageConverters拿到，利用内容转换器 进行转换写出
+	 * @param springFormEncoder
+	 * @param messageConverters
+	 */
 	public SpringEncoder(SpringFormEncoder springFormEncoder,
 			ObjectFactory<HttpMessageConverters> messageConverters) {
 		this.springFormEncoder = springFormEncoder;
@@ -80,10 +85,12 @@ public class SpringEncoder implements Encoder {
 			throws EncodeException {
 		// template.body(conversionService.convert(object, String.class));
 		if (requestBody != null) {
+			// TODO: 请求体类型
 			Collection<String> contentTypes = request.headers()
 					.get(HttpEncoding.CONTENT_TYPE);
 
 			MediaType requestContentType = null;
+			// TODO: 如果请求体类型不为空
 			if (contentTypes != null && !contentTypes.isEmpty()) {
 				String type = contentTypes.iterator().next();
 				requestContentType = MediaType.valueOf(type);
@@ -101,6 +108,9 @@ public class SpringEncoder implements Encoder {
 				}
 			}
 
+			/**
+			 * TODO: 这里就是一个个的判断内容转换器，能否将内容写出，如果可以，就采用拿到的messageConvert去写出
+			 */
 			for (HttpMessageConverter messageConverter : this.messageConverters
 					.getObject().getConverters()) {
 				FeignOutputMessage outputMessage;
@@ -138,6 +148,7 @@ public class SpringEncoder implements Encoder {
 					else {
 						charset = StandardCharsets.UTF_8;
 					}
+					// TODO: 最后的最后，把字节流 放到request的body里面
 					request.body(Request.Body.encoded(
 							outputMessage.getOutputStream().toByteArray(), charset));
 					return;
