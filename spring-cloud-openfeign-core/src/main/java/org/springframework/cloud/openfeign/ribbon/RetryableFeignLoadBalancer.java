@@ -64,6 +64,13 @@ public class RetryableFeignLoadBalancer extends FeignLoadBalancer
 		this.setRetryHandler(new DefaultLoadBalancerRetryHandler(clientConfig));
 	}
 
+	/**
+	 * TODO: 这是一个可重试的 http 请求
+	 * @param request
+	 * @param configOverride
+	 * @return
+	 * @throws IOException
+	 */
 	@Override
 	public RibbonResponse execute(final RibbonRequest request,
 			IClientConfig configOverride) throws IOException {

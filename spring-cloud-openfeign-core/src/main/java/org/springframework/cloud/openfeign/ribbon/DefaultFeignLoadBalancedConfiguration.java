@@ -29,10 +29,18 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 class DefaultFeignLoadBalancedConfiguration {
 
+
+	/**
+	 * TODO: 当使用loadBalance的时候，会去applicationContext中 把当前配置的 client 加进来
+	 * @param cachingFactory
+	 * @param clientFactory
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public Client feignClient(CachingSpringLoadBalancerFactory cachingFactory,
 			SpringClientFactory clientFactory) {
+		// TODO: 对于ribbon而言，这里注入的feignClient是 LoadBalancerFeignClient 内部委托给了client去实际调请求，算是一种包装者(委托者)模式
 		return new LoadBalancerFeignClient(new Client.Default(null, null), cachingFactory,
 				clientFactory);
 	}

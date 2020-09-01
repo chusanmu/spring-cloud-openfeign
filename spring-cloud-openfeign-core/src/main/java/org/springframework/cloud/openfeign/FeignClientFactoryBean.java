@@ -94,6 +94,7 @@ class FeignClientFactoryBean
 	 * @return
 	 */
 	protected Feign.Builder feign(FeignContext context) {
+		// TODO: 把feignLoggerFactory拿到，只会在当前的隔离的 applicationContext中取
 		FeignLoggerFactory loggerFactory = get(context, FeignLoggerFactory.class);
 		Logger logger = loggerFactory.create(this.type);
 
@@ -102,11 +103,12 @@ class FeignClientFactoryBean
 		Feign.Builder builder = get(context, Feign.Builder.class)
 				// required values
 				.logger(logger)
+			// TODO: 从applicationContext中依次取出下列组件
 				.encoder(get(context, Encoder.class))
 				.decoder(get(context, Decoder.class))
 				.contract(get(context, Contract.class));
 		// @formatter:on
-
+		// TODO: 对feign客户端进行配置
 		configureFeign(context, builder);
 
 		return builder;
@@ -260,6 +262,7 @@ class FeignClientFactoryBean
 	}
 
 	protected <T> T get(FeignContext context, Class<T> type) {
+		// TODO: 根据contextId, 把applicationContext拿到，之后在applicationContext中把type类型的bean拿到
 		T instance = context.getInstance(this.contextId, type);
 		if (instance == null) {
 			throw new IllegalStateException(
@@ -315,10 +318,12 @@ class FeignClientFactoryBean
 	 * information
 	 */
 	<T> T getTarget() {
+		// TODO: 从容器中把 FeignContext取出来，其实默认在自动装配 配置文件中有配置
 		FeignContext context = this.applicationContext.getBean(FeignContext.class);
-		// TODO: 重点，构建feign的builder
+		// TODO: 重点，根据 FeignContext 构建feign的builder
 		Feign.Builder builder = feign(context);
 
+		// TODO: 如果url为空，表示不是直接根据url调用，而是根据项目名进行eureka负载均衡调用
 		if (!StringUtils.hasText(this.url)) {
 			if (!this.name.startsWith("http")) {
 				this.url = "http://" + this.name;
@@ -334,8 +339,10 @@ class FeignClientFactoryBean
 			this.url = "http://" + this.url;
 		}
 		String url = this.url + cleanPath();
+		// TODO: 此处重点，尝试从当前IOC容器中拿到Client类型的，如果拿到了 则下面的判断条件成立
 		Client client = getOptional(context, Client.class);
 		if (client != null) {
+			// TODO: 把实际执行的client拿到
 			if (client instanceof LoadBalancerFeignClient) {
 				// not load balancing because we have a url,
 				// but ribbon is on the classpath, so unwrap
@@ -346,9 +353,11 @@ class FeignClientFactoryBean
 				// but Spring Cloud LoadBalancer is on the classpath, so unwrap
 				client = ((FeignBlockingLoadBalancerClient) client).getDelegate();
 			}
+			// TODO: 把client重新塞进去, 这样就覆盖掉了之前 默认的
 			builder.client(client);
 		}
 		Targeter targeter = get(context, Targeter.class);
+		// TODO: 这里和loadBalance(build..)的区别是啥呢？注意，下面你可以不配置client，是不会报错的，但是使用loadBalance 如果不配置 client，就会报错
 		return (T) targeter.target(this, builder, context,
 				new HardCodedTarget<>(this.type, this.name, url));
 	}

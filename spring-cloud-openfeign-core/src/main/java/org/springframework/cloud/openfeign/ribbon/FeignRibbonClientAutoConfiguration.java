@@ -51,6 +51,7 @@ import org.springframework.context.annotation.Primary;
 // Order is important here, last should be the default, first should be optional
 // see
 // https://github.com/spring-cloud/spring-cloud-netflix/issues/2086#issuecomment-316281653
+// TODO: 这里导入了三种http client的适配，其实外层都是套了一层 LoadBalancerFeignClient
 @Import({ HttpClientFeignLoadBalancedConfiguration.class,
 		OkHttpFeignLoadBalancedConfiguration.class,
 		DefaultFeignLoadBalancedConfiguration.class })

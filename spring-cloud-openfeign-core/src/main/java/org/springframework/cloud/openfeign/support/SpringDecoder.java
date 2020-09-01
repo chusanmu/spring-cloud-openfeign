@@ -55,7 +55,7 @@ public class SpringDecoder implements Decoder {
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			HttpMessageConverterExtractor<?> extractor = new HttpMessageConverterExtractor(
 					type, this.messageConverters.getObject().getConverters());
-
+			// TODO: 使用httpMessageConverters 去逐个处理解码
 			return extractor.extractData(new FeignResponseAdapter(response));
 		}
 		throw new DecodeException(response.status(),

@@ -44,10 +44,12 @@ class HystrixTargeter implements Targeter {
 		if (setterFactory != null) {
 			builder.setterFactory(setterFactory);
 		}
+		// TODO: 去注册fallback
 		Class<?> fallback = factory.getFallback();
 		if (fallback != void.class) {
 			return targetWithFallback(name, context, target, builder, fallback);
 		}
+		// TODO: 这里HystrixTargeter 去注册 fallback工厂，失败回调
 		Class<?> fallbackFactory = factory.getFallbackFactory();
 		if (fallbackFactory != void.class) {
 			return targetWithFallbackFactory(name, context, target, builder,

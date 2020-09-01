@@ -78,6 +78,13 @@ public class FeignLoadBalancer extends
 		this.serverIntrospector = serverIntrospector;
 	}
 
+	/**
+	 * TODO: 真正去执行http请求时 调用此方法
+	 * @param request
+	 * @param configOverride
+	 * @return
+	 * @throws IOException
+	 */
 	@Override
 	public RibbonResponse execute(RibbonRequest request, IClientConfig configOverride)
 			throws IOException {
@@ -90,6 +97,7 @@ public class FeignLoadBalancer extends
 		else {
 			options = new Request.Options(this.connectTimeout, this.readTimeout);
 		}
+		// TODO: 这里利用 @Import 进来的 LoadBalancerFeignClient 去发起一个请求
 		Response response = request.client().execute(request.toRequest(), options);
 		return new RibbonResponse(request.getUri(), response);
 	}

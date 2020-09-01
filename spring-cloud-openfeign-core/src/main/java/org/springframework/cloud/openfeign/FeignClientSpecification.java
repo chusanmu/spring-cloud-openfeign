@@ -22,6 +22,7 @@ import java.util.Objects;
 import org.springframework.cloud.context.named.NamedContextFactory;
 
 /**
+ * TODO: 主要用来存储 每个feignClient ----对应的配置文件----
  * @author Dave Syer
  * @author Gregor Zurowski
  */

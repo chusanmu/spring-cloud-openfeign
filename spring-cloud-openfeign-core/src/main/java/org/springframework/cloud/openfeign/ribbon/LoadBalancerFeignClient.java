@@ -37,6 +37,9 @@ public class LoadBalancerFeignClient implements Client {
 
 	static final Request.Options DEFAULT_OPTIONS = new Request.Options();
 
+	/**
+	 * TODO: 真正的发起请求，还是靠delegate去做，委派模式
+	 */
 	private final Client delegate;
 
 	private CachingSpringLoadBalancerFactory lbClientFactory;
@@ -79,7 +82,9 @@ public class LoadBalancerFeignClient implements Client {
 					this.delegate, request, uriWithoutHost);
 
 			IClientConfig requestConfig = getClientConfig(options, clientName);
+			// TODO: 当你项目中使用ribbon的时候，会使用这种方式去 使用线程隔离的方式去执行请求
 			return lbClient(clientName)
+				// TODO: 内部会使用新线程去调用
 					.executeWithLoadBalancer(ribbonRequest, requestConfig).toResponse();
 		}
 		catch (ClientException e) {

@@ -90,18 +90,21 @@ class FeignClientsRegistrar
 		String host = null;
 		try {
 			String url;
+			// TODO: 如果不是http活着https开头的，那就设置成默认的 http开头
 			if (!name.startsWith("http://") && !name.startsWith("https://")) {
 				url = "http://" + name;
 			}
 			else {
 				url = name;
 			}
+			// TODO: 把host拿到
 			host = new URI(url).getHost();
 
 		}
 		catch (URISyntaxException e) {
 		}
 		Assert.state(host != null, "Service id not legal hostname (" + name + ")");
+		// TODO: 最后把name返回
 		return name;
 	}
 
@@ -240,6 +243,7 @@ class FeignClientsRegistrar
 					String name = getClientName(attributes);
 					// TODO: 注册配置类，当前feign Client的专属配置类
 					registerClientConfiguration(registry, name,
+							// TODO: 注意@FeignClient 可以配置多个 configuration
 							attributes.get("configuration"));
 					// TODO: 注册一个feign client 重点
 					registerFeignClient(registry, annotationMetadata, attributes);
@@ -258,9 +262,11 @@ class FeignClientsRegistrar
 			AnnotationMetadata annotationMetadata, Map<String, Object> attributes) {
 		String className = annotationMetadata.getClassName();
 		// TODO: 注意，这里注册的其实是FeignClientFactoryBean， 这个工厂bean待会研究
+		// TODO: 这里其实是每个feignClient都注册了一个FeignClientFactoryBean
 		BeanDefinitionBuilder definition = BeanDefinitionBuilder
 				.genericBeanDefinition(FeignClientFactoryBean.class);
 		validate(attributes);
+		// TODO: 从 @FeignClient 里面解析出来一系列的属性值，然后加进去
 		definition.addPropertyValue("url", getUrl(attributes));
 		definition.addPropertyValue("path", getPath(attributes));
 		String name = getName(attributes);
@@ -287,6 +293,7 @@ class FeignClientsRegistrar
 			alias = qualifier;
 		}
 
+		// TODO: 注册beanDefinition
 		BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, className,
 				new String[] { alias });
 		BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
@@ -301,6 +308,7 @@ class FeignClientsRegistrar
 	}
 
 	/* for testing */ String getName(Map<String, Object> attributes) {
+		// TODO: 先从serviceId取起，如果没有接着去name, value
 		String name = (String) attributes.get("serviceId");
 		if (!StringUtils.hasText(name)) {
 			name = (String) attributes.get("name");
@@ -308,12 +316,14 @@ class FeignClientsRegistrar
 		if (!StringUtils.hasText(name)) {
 			name = (String) attributes.get("value");
 		}
+		// TODO: 这里可以看出 它还支持el表达式
 		name = resolve(name);
 		return getName(name);
 	}
 
 	private String getContextId(Map<String, Object> attributes) {
 		String contextId = (String) attributes.get("contextId");
+		// TODO: 如果没有设置contextId, 那么就去取name了
 		if (!StringUtils.hasText(contextId)) {
 			return getName(attributes);
 		}
@@ -402,6 +412,7 @@ class FeignClientsRegistrar
 		if (client == null) {
 			return null;
 		}
+		// TODO: 这里维护了feign client name的优先级
 		String value = (String) client.get("contextId");
 		if (!StringUtils.hasText(value)) {
 			value = (String) client.get("value");
@@ -427,6 +438,7 @@ class FeignClientsRegistrar
 				.genericBeanDefinition(FeignClientSpecification.class);
 		// TODO: 把这两个值设置到FeignClientSpecification的构造方法中
 		builder.addConstructorArgValue(name);
+		// TODO: 这里的configuration是开启 @EnableFeignClients时自己指定的配置类，默认所有的feign client都使用这个配置类
 		builder.addConstructorArgValue(configuration);
 		registry.registerBeanDefinition(
 				name + "." + FeignClientSpecification.class.getSimpleName(),

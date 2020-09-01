@@ -71,6 +71,7 @@ public @interface EnableFeignClients {
 	Class<?>[] basePackageClasses() default {};
 
 	/**
+	 * TODO: 可以配置一个公共的默认的配置类，自己可以指定
 	 * A custom <code>@Configuration</code> for all feign clients. Can contain override
 	 * <code>@Bean</code> definition for the pieces that make up the client, for instance
 	 * {@link feign.codec.Decoder}, {@link feign.codec.Encoder}, {@link feign.Contract}.

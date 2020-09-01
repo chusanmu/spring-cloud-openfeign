@@ -53,6 +53,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
+ * TODO: feign的自动配置的配置文件
  * @author Spencer Gibb
  * @author Julien Roy
  */
@@ -74,9 +75,13 @@ public class FeignAutoConfiguration {
 	@Bean
 	public FeignContext feignContext() {
 		FeignContext context = new FeignContext();
+		// TODO: 最后配置了每个client对应的配置文件
 		context.setConfigurations(this.configurations);
 		return context;
 	}
+
+
+	/* ---------------- 下面两个是一组相反的，二选一注入，如果存在HystrixFeign则注入 HystrixTargeter -------------- */
 
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(name = "feign.hystrix.HystrixFeign")
@@ -172,6 +177,9 @@ public class FeignAutoConfiguration {
 
 	}
 
+	/**
+	 * TODO: 这是使用okhttp时 使用的一些组件
+	 */
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(OkHttpClient.class)
 	@ConditionalOnMissingClass("com.netflix.loadbalancer.ILoadBalancer")
