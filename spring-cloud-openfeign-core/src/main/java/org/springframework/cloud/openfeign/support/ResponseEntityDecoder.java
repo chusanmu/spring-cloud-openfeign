@@ -32,6 +32,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * TODO: 对ResponseEntity进行解码
  * Decoder adds compatibility for Spring MVC's ResponseEntity to any other decoder via
  * composition.
  *
@@ -48,17 +49,20 @@ public class ResponseEntityDecoder implements Decoder {
 	@Override
 	public Object decode(final Response response, Type type)
 			throws IOException, FeignException {
-
+		// TODO: 如果泛型里面的类型是HttpEntity类型的
 		if (isParameterizeHttpEntity(type)) {
+			// TODO: 把它类型拿到进行解码
 			type = ((ParameterizedType) type).getActualTypeArguments()[0];
 			Object decodedObject = this.decoder.decode(response, type);
-
+			// TODO: 把解码返回来的结果 封装成 ResponseEntity 返回回去
 			return createResponse(decodedObject, response);
 		}
+		// TODO: 如果返回你写的就是ResponseEntity，会把结果封装成ResponseEntity进行返回
 		else if (isHttpEntity(type)) {
 			return createResponse(null, response);
 		}
 		else {
+			// TODO: 如果是其他类型的，那就交给decoder去解码吧
 			return this.decoder.decode(response, type);
 		}
 	}
@@ -80,12 +84,12 @@ public class ResponseEntityDecoder implements Decoder {
 
 	@SuppressWarnings("unchecked")
 	private <T> ResponseEntity<T> createResponse(Object instance, Response response) {
-
+		// TODO: 会把请求头拿过来
 		MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 		for (String key : response.headers().keySet()) {
 			headers.put(key, new LinkedList<>(response.headers().get(key)));
 		}
-
+		// TODO: 创建一个ResponseEntity返回回去
 		return new ResponseEntity<>((T) instance, headers,
 				HttpStatus.valueOf(response.status()));
 	}

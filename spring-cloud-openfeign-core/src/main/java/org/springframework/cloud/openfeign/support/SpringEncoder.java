@@ -60,8 +60,14 @@ public class SpringEncoder implements Encoder {
 
 	private static final Log log = LogFactory.getLog(SpringEncoder.class);
 
+	/**
+	 * TODO: 对表单提交的支持
+	 */
 	private final SpringFormEncoder springFormEncoder;
 
+	/**
+	 * TODO: 消息转换器
+	 */
 	private final ObjectFactory<HttpMessageConverters> messageConverters;
 
 	public SpringEncoder(ObjectFactory<HttpMessageConverters> messageConverters) {
@@ -95,12 +101,14 @@ public class SpringEncoder implements Encoder {
 				String type = contentTypes.iterator().next();
 				requestContentType = MediaType.valueOf(type);
 			}
-
+			// TODO: 如果你的contentType是 MULTIPART_FORM_DATA
 			if (Objects.equals(requestContentType, MediaType.MULTIPART_FORM_DATA)) {
+				// TODO: 使用表单encoder
 				this.springFormEncoder.encode(requestBody, bodyType, request);
 				return;
 			}
 			else {
+				// TODO: 如果你请求体是MultipartFile类型的，但是呢 content-Type又不是multipart_form_data, 那这时候就打印一行log
 				if (bodyType == MultipartFile.class) {
 					log.warn(
 							"For MultipartFile to be handled correctly, the 'consumes' parameter of @RequestMapping "
@@ -121,6 +129,7 @@ public class SpringEncoder implements Encoder {
 								(GenericHttpMessageConverter) messageConverter, request);
 					}
 					else {
+						// TODO: 检查这种消息转换器能否将此body进行写出
 						outputMessage = checkAndWrite(requestBody, requestContentType,
 								messageConverter, request);
 					}
@@ -133,6 +142,7 @@ public class SpringEncoder implements Encoder {
 					request.headers(null);
 					// converters can modify headers, so update the request
 					// with the modified headers
+					// TODO: converters可以修改请求头，所以更新下请求头
 					request.headers(getHeaders(outputMessage.getHeaders()));
 
 					// do not use charset for binary data and protobuf
@@ -148,12 +158,14 @@ public class SpringEncoder implements Encoder {
 					else {
 						charset = StandardCharsets.UTF_8;
 					}
-					// TODO: 最后的最后，把字节流 放到request的body里面
+					// TODO: 最后的最后，把字节流 放到request的body里面, 表示编码好了，可以发送了
 					request.body(Request.Body.encoded(
+						// TODO: 从输出流里面获取字节信息
 							outputMessage.getOutputStream().toByteArray(), charset));
 					return;
 				}
 			}
+			// TODO: 这个异常有时候可能会经常看到，没有找到合适的消息转换器 对于这个消息体类型
 			String message = "Could not write request: no suitable HttpMessageConverter "
 					+ "found for request type [" + requestBody.getClass().getName() + "]";
 			if (requestContentType != null) {
@@ -166,9 +178,12 @@ public class SpringEncoder implements Encoder {
 	@SuppressWarnings("unchecked")
 	private FeignOutputMessage checkAndWrite(Object body, MediaType contentType,
 			HttpMessageConverter converter, RequestTemplate request) throws IOException {
+		// TODO: 判断能否将这种类型的java对象，根据指定的content-type去写出，如果可以就进行写出
 		if (converter.canWrite(body.getClass(), contentType)) {
+			// TODO: 在写之前打印log
 			logBeforeWrite(body, contentType, converter);
 			FeignOutputMessage outputMessage = new FeignOutputMessage(request);
+			// TODO: 调用write方法写出，会写到输出流里面
 			converter.write(body, contentType, outputMessage);
 			return outputMessage;
 		}

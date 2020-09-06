@@ -37,10 +37,15 @@ import org.springframework.web.client.HttpMessageConverterExtractor;
 import static org.springframework.cloud.openfeign.support.FeignUtils.getHttpHeaders;
 
 /**
+ * TODO: spring支持的解码器
+ *
  * @author Spencer Gibb
  */
 public class SpringDecoder implements Decoder {
 
+	/**
+	 * TODO: 首先把messageConverters通过构造方法设置进来
+	 */
 	private ObjectFactory<HttpMessageConverters> messageConverters;
 
 	public SpringDecoder(ObjectFactory<HttpMessageConverters> messageConverters) {
@@ -55,7 +60,7 @@ public class SpringDecoder implements Decoder {
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			HttpMessageConverterExtractor<?> extractor = new HttpMessageConverterExtractor(
 					type, this.messageConverters.getObject().getConverters());
-			// TODO: 使用httpMessageConverters 去逐个处理解码
+			// TODO: 内部使用httpMessageConverters 去逐个处理解码，交给了HttpMessageConverterExtractor 去处理
 			return extractor.extractData(new FeignResponseAdapter(response));
 		}
 		throw new DecodeException(response.status(),

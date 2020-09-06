@@ -36,6 +36,9 @@ import static feign.Util.emptyToNull;
  */
 public class RequestPartParameterProcessor implements AnnotatedParameterProcessor {
 
+	/**
+	 * TODO: 支持对@RequestPart
+	 */
 	private static final Class<RequestPart> ANNOTATION = RequestPart.class;
 
 	@Override
@@ -46,17 +49,20 @@ public class RequestPartParameterProcessor implements AnnotatedParameterProcesso
 	@Override
 	public boolean processArgument(AnnotatedParameterContext context,
 			Annotation annotation, Method method) {
+		// TODO: 获得参数角标和方法的元信息
 		int parameterIndex = context.getParameterIndex();
 		MethodMetadata data = context.getMethodMetadata();
-
+		// TODO: 进行注解的强转，然后获取value值
 		String name = ANNOTATION.cast(annotation).value();
+		// TODO: check name 不能为空
 		checkState(emptyToNull(name) != null,
 				"RequestPart.value() was empty on parameter %s", parameterIndex);
 		context.setParameterName(name);
-
+		// TODO: 添加到form参数里面去
 		data.formParams().add(name);
 		Collection<String> names = context.setTemplateParameter(name,
 				data.indexToName().get(parameterIndex));
+		// TODO: 最后又加了一次，这里不是特别理解，因为平时开发用的也少
 		data.indexToName().put(parameterIndex, names);
 		return true;
 	}

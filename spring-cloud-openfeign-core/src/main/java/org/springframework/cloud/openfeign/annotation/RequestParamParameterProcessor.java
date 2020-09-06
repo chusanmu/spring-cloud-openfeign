@@ -30,6 +30,7 @@ import static feign.Util.checkState;
 import static feign.Util.emptyToNull;
 
 /**
+ * TODO: RequestParam注解处理器
  * {@link RequestParam} parameter processor.
  *
  * @author Jakub Narloch
@@ -38,6 +39,9 @@ import static feign.Util.emptyToNull;
  */
 public class RequestParamParameterProcessor implements AnnotatedParameterProcessor {
 
+	/**
+	 * 对RequestParam注解的支持
+	 */
 	private static final Class<RequestParam> ANNOTATION = RequestParam.class;
 
 	@Override
@@ -48,26 +52,33 @@ public class RequestParamParameterProcessor implements AnnotatedParameterProcess
 	@Override
 	public boolean processArgument(AnnotatedParameterContext context,
 			Annotation annotation, Method method) {
+		// TODO: 把此注解对应的参数的角标拿到
 		int parameterIndex = context.getParameterIndex();
+		// TODO: 把注解标注的参数 的参数类型拿到
 		Class<?> parameterType = method.getParameterTypes()[parameterIndex];
+		// TODO: 获取方法元数据
 		MethodMetadata data = context.getMethodMetadata();
-
+		// TODO: 判断参数类型是否是Map
 		if (Map.class.isAssignableFrom(parameterType)) {
 			checkState(data.queryMapIndex() == null,
 					"Query map can only be present once.");
+			// TODO: 如果是个Map，那就设置queryMap的Index，需要注意queryMapIndex只能有一个
 			data.queryMapIndex(parameterIndex);
 
 			return true;
 		}
-
+		// TODO: 进行注解类型的强转
 		RequestParam requestParam = ANNOTATION.cast(annotation);
+		// TODO: 把value值取到
 		String name = requestParam.value();
+		// TODO: name不能为空，name值为空，直接抛出异常
 		checkState(emptyToNull(name) != null,
 				"RequestParam.value() was empty on parameter %s", parameterIndex);
 		context.setParameterName(name);
 
 		Collection<String> query = context.setTemplateParameter(name,
 				data.template().queries().get(name));
+		// TODO: 设置queryTemplate，设置query模板
 		data.template().query(name, query);
 		return true;
 	}

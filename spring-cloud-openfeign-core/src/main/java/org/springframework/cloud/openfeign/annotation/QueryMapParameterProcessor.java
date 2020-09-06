@@ -25,6 +25,7 @@ import org.springframework.cloud.openfeign.AnnotatedParameterProcessor;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 
 /**
+ * TODO: 主要处理SpringQueryMap注解，SpringQueryMap在平时的开发中，用的挺多的
  * {@link SpringQueryMap} parameter processor.
  *
  * @author Aram Peres
@@ -32,6 +33,9 @@ import org.springframework.cloud.openfeign.SpringQueryMap;
  */
 public class QueryMapParameterProcessor implements AnnotatedParameterProcessor {
 
+	/**
+	 * TODO: SpringQueryMap 生效原理
+	 */
 	private static final Class<SpringQueryMap> ANNOTATION = SpringQueryMap.class;
 
 	@Override
@@ -42,10 +46,14 @@ public class QueryMapParameterProcessor implements AnnotatedParameterProcessor {
 	@Override
 	public boolean processArgument(AnnotatedParameterContext context,
 			Annotation annotation, Method method) {
+		// TODO: 获得参数下标，以及方法元信息
 		int paramIndex = context.getParameterIndex();
 		MethodMetadata metadata = context.getMethodMetadata();
+		// TODO: 如果queryMapIndex为空，才去处理
 		if (metadata.queryMapIndex() == null) {
+			// TODO: 把当前参数角标设置为queryMap的下标，其实和 feign 原生注解 QueryMap 处理一样
 			metadata.queryMapIndex(paramIndex);
+			// TODO: 设置map是否编码
 			metadata.queryMapEncoded(SpringQueryMap.class.cast(annotation).encoded());
 		}
 		return true;

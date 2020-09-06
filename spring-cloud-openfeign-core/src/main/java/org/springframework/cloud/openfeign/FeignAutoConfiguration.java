@@ -76,6 +76,8 @@ public class FeignAutoConfiguration {
 	public FeignContext feignContext() {
 		FeignContext context = new FeignContext();
 		// TODO: 最后配置了每个client对应的配置文件
+		// TODO: 注意，这里设置进去的configurations 可能会有多个，每配置一个FeignClient都会产生一个 即使这个feignClient对应的configuration为空
+		// TODO: 然后还有一个是 启动类上的 @EnableFeignClients 也会产生一个FeignClientSpecification, 具体的见 @See FeignClientsRegistrar
 		context.setConfigurations(this.configurations);
 		return context;
 	}
